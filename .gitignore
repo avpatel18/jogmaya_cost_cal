@@ -1,0 +1,9 @@
+node_modules/
+.next/
+.env*
+.DS_Store
+coverage/
+.vercel/
+.nyc_output/
+*.log
+scripts/calc_email_map.csv

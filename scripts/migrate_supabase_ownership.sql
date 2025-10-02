@@ -1,0 +1,48 @@
+-- scripts/migrate_supabase_ownership.sql
+-- Purpose: Map ownership of calculations to NextAuth users by email.
+-- Prerequisites:
+--   1) You have imported your Supabase users into a staging table called supabase_users
+--      with at least: id (uuid/text), email (text)
+--   2) You have imported your Supabase calculations into staging table supabase_calculations
+--      with at least: id (text), user_id (supabase user id), and all other calculation columns
+--   3) Your NextAuth users are in the "User" table (created by Prisma/NextAuth) with email and id (cuid)
+--   4) Your application data has been inserted into the new tables ("calculations", "weft_yarns", "weft_feeders")
+--      OR you plan to insert them using an INSERT ... SELECT that also joins emails as shown below.
+--
+-- If you are still inserting data into the new schema, use the email join at INSERT time (preferred):
+-- Example (adjust column names to your actual schema):
+-- INSERT INTO calculations (
+--   id, "userId", "qualityName", "totalCard", "pickOnLooms", pano,
+--   "wastagePercent", "jobCharge", "rebatePercent", "salesRate", "brokeragePercent",
+--   "createdAt", "updatedAt"
+-- )
+-- SELECT
+--   sc.id,
+--   u.id as userId,
+--   sc.quality_name,
+--   sc.total_card,
+--   sc.pick_on_looms,
+--   sc.pano,
+--   sc.wastage_percent,
+--   sc.job_charge,
+--   sc.rebate_percent,
+--   sc.sales_rate,
+--   sc.brokerage_percent,
+--   sc.created_at,
+--   sc.updated_at
+-- FROM supabase_calculations sc
+-- JOIN supabase_users su ON su.id = sc.user_id
+-- JOIN "User" u ON u.email = su.email;
+--
+-- If you already inserted calculations without userId, fix ownership by email now (post-insert):
+-- Update calculations by joining through a temporary map of calculation id -> email.
+-- Create a temp mapping view/table first (if you don't still have supabase_calculations around):
+--   CREATE TABLE calc_email_map (calc_id text primary key, email text not null);
+--   -- Load this from your export: two columns: calc_id,email
+--   -- Then run the UPDATE below:
+--
+-- UPDATE calculations c
+-- SET "userId" = u.id
+-- FROM "User" u
+-- JOIN calc_email_map cem ON cem.email = u.email
+-- WHERE c.id = cem.calc_id;
