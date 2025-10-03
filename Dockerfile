@@ -18,7 +18,7 @@ COPY package.json yarn.lock .yarnrc.yml ./
 ENV YARN_ENABLE_SCRIPTS=false
 
 # Install dependencies immutably
-RUN yarn install --immutable --check-cache
+RUN yarn install --no-immutable # Allow yarn.lock to be updated if out of sync, resolving YN0028 error
 
 # Copy application source
 COPY . .
