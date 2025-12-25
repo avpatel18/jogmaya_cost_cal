@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "prisma migrate deploy && next start -p $PORT",
     "lint": "next lint",
+    "test": "vitest",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "postinstall": "prisma generate"
   },
@@ -32,7 +33,8 @@
     "tailwindcss-animate": "1.0.7",
     "ts-node": "10.9.2",
     "tsx": "4.20.3",
-    "typescript": "5.2.2"
+    "typescript": "5.2.2",
+    "vitest": "^4.0.16"
   },
   "dependencies": {
     "@floating-ui/react": "0.26.0",
@@ -67,12 +69,6 @@
     "@radix-ui/react-toggle": "1.1.0",
     "@radix-ui/react-toggle-group": "1.1.0",
     "@radix-ui/react-tooltip": "1.1.2",
-    "@supabase/auth-helpers-nextjs": "^0.10.0",
-    "@supabase/auth-helpers-react": "^0.5.0",
-    "@supabase/auth-ui-react": "^0.4.7",
-    "@supabase/auth-ui-shared": "^0.1.8",
-    "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.54.0",
     "@tanstack/react-query": "5.0.0",
     "@types/bcryptjs": "2.4.6",
     "@types/jsonwebtoken": "9.0.5",
@@ -99,7 +95,7 @@
     "lodash": "4.17.21",
     "lucide-react": "0.446.0",
     "mapbox-gl": "1.13.3",
-    "next": "14.2.28",
+    "next": "^14.2.35",
     "next-auth": "4.24.11",
     "next-themes": "0.3.0",
     "plotly.js": "2.35.3",

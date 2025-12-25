@@ -8,13 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { motion } from 'framer-motion';
-import { 
-  Calculator, 
-  Download, 
-  Save, 
-  FolderOpen, 
-  Plus, 
-  Trash2,
+import {
+  Calculator,
+  Download,
+  Save,
+  FolderOpen,
   Settings
 } from 'lucide-react';
 import {
@@ -35,7 +33,6 @@ import {
   calculateWarpYarns,
   calculateGeneralCost,
   calculateProfit,
-  formatCurrency,
   formatNumber,
   getWeftTotals,
   getWarpTotals
@@ -92,14 +89,14 @@ export default function TextileCalculator() {
   const [warpYarns, setWarpYarns] = useState<WarpYarn[]>([
     { ...defaultWarpYarn }
   ]);
-  
+
   // Calculated values
   const [lengthAndPick, setLengthAndPick] = useState<LengthAndPick>({ lengthCm: 0, lengthMtr: 0, averagePick: 0 });
   const [weftCalculated, setWeftCalculated] = useState<WeftCalculated[]>([]);
   const [warpCalculated, setWarpCalculated] = useState<WarpCalculated[]>([]);
   const [generalCost, setGeneralCost] = useState<GeneralCost>({ yarnCost: 0, jobCost: 0, costWithWastage: 0, costWithoutWastage: 0, oneMtrCost: 0, rebate: 0, netRate: 0 });
   const [profit, setProfit] = useState<Profit>({ onePieceProfit: 0, jobProfit: 0, profitPercent: 0 });
-  
+
   // UI state
   const [saveLoadOpen, setSaveLoadOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -109,23 +106,23 @@ export default function TextileCalculator() {
     // Get primary feeder card (first feeder with data)
     const primaryFeeder = weftFeeders.find(f => f.card > 0);
     const primaryFeederCard = primaryFeeder?.card || 0;
-    
+
     // Calculate length and pick
     const newLengthAndPick = calculateLengthAndPick(mainInfo, primaryFeederCard);
     setLengthAndPick(newLengthAndPick);
-    
+
     // Calculate weft values
     const newWeftCalculated = calculateWeftFeeders(weftFeeders, newLengthAndPick, mainInfo.pano);
     setWeftCalculated(newWeftCalculated);
-    
+
     // Calculate warp values
     const newWarpCalculated = calculateWarpYarns(warpYarns, newLengthAndPick.lengthMtr);
     setWarpCalculated(newWarpCalculated);
-    
+
     // Calculate costs
     const newGeneralCost = calculateGeneralCost(newWeftCalculated, newWarpCalculated, extraInfo, newLengthAndPick);
     setGeneralCost(newGeneralCost);
-    
+
     // Calculate profit
     const newProfit = calculateProfit(newGeneralCost, extraInfo, newLengthAndPick);
     setProfit(newProfit);
@@ -171,13 +168,13 @@ export default function TextileCalculator() {
   };
 
   // Export to Excel functionality
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
     try {
-      const XLSX = require('xlsx');
-      
+      const XLSX = await import('xlsx');
+
       // Create a new workbook
       const wb = XLSX.utils.book_new();
-      
+
       // Prepare data for export
       const exportData = [
         ['Textile Cost Calculator Export'],
@@ -202,11 +199,11 @@ export default function TextileCalculator() {
           formatNumber(feeder.totalWithWastage, 3),
           feeder.costing
         ]),
-        ['TOTALS', '', getWeftTotals(weftCalculated).totalCard, '', '', '', 
-         formatNumber(getWeftTotals(weftCalculated).totalPick),
-         formatNumber(getWeftTotals(weftCalculated).totalWeight, 3),
-         formatNumber(getWeftTotals(weftCalculated).totalWithWastage, 3),
-         getWeftTotals(weftCalculated).totalCosting],
+        ['TOTALS', '', getWeftTotals(weftCalculated).totalCard, '', '', '',
+          formatNumber(getWeftTotals(weftCalculated).totalPick),
+          formatNumber(getWeftTotals(weftCalculated).totalWeight, 3),
+          formatNumber(getWeftTotals(weftCalculated).totalWithWastage, 3),
+          getWeftTotals(weftCalculated).totalCosting],
         [''],
         ['Warp Section:'],
         ['Yarn Name', 'Tar', 'Denier', 'Rate', 'Weight', 'Costing'],
@@ -218,9 +215,9 @@ export default function TextileCalculator() {
           formatNumber(yarn.weight, 3),
           yarn.costing
         ]),
-        ['TOTALS', '', '', '', 
-         formatNumber(getWarpTotals(warpCalculated).totalWeight, 3),
-         getWarpTotals(warpCalculated).totalCosting],
+        ['TOTALS', '', '', '',
+          formatNumber(getWarpTotals(warpCalculated).totalWeight, 3),
+          getWarpTotals(warpCalculated).totalCosting],
         [''],
         ['Extra Info:'],
         ['Post-Sale Wastage%:', extraInfo.wastagePercent],
@@ -244,19 +241,19 @@ export default function TextileCalculator() {
         ['Job Profit:', profit.jobProfit],
         ['Profit %:', formatNumber(profit.profitPercent, 2) + '%']
       ];
-      
+
       // Create worksheet from data
       const ws = XLSX.utils.aoa_to_sheet(exportData);
-      
+
       // Add worksheet to workbook
       XLSX.utils.book_append_sheet(wb, ws, 'Textile Calculation');
-      
+
       // Generate filename with current date
       const filename = `textile_calculation_${qualityName.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
-      
+
       // Save file
       XLSX.writeFile(wb, filename);
-      
+
       alert('Excel file exported successfully!');
     } catch (error) {
       console.error('Error exporting to Excel:', error);
@@ -288,7 +285,7 @@ export default function TextileCalculator() {
 
       const response = await fetch('/api/calculations', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(calculationData)
@@ -321,7 +318,7 @@ export default function TextileCalculator() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header Actions */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-wrap gap-4 justify-center mb-6"

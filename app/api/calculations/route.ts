@@ -8,7 +8,7 @@ import { Calculation as CalcInput } from '@/lib/types';
 export const dynamic = 'force-dynamic';
 
 // Get all calculations for the authenticated user
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions)
     if (!session || !session.user?.email) {

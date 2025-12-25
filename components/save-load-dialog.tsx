@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -12,12 +12,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  FolderOpen, 
-  Calendar, 
-  Trash2, 
+import {
+  FolderOpen,
+  Calendar,
+  Trash2,
   Eye,
-  RefreshCw 
+  RefreshCw
 } from 'lucide-react';
 import { Calculation } from '@/lib/types';
 import { formatCurrency } from '@/lib/calculations';
@@ -72,16 +72,9 @@ export default function SaveLoadDialog({
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
 
-  // Fetch calculations when dialog opens
-  useEffect(() => {
-    if (isOpen && user) {
-      fetchCalculations();
-    }
-  }, [isOpen, user]);
-
-  const fetchCalculations = async () => {
+  const fetchCalculations = useCallback(async () => {
     if (!user) return;
-    
+
     setLoading(true);
     try {
       const response = await fetch('/api/calculations');
@@ -96,17 +89,24 @@ export default function SaveLoadDialog({
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  // Fetch calculations when dialog opens
+  useEffect(() => {
+    if (isOpen && user) {
+      fetchCalculations();
+    }
+  }, [isOpen, user, fetchCalculations]);
 
   const deleteCalculation = async (id: string) => {
     if (!user) return;
-    
+
     setDeleting(id);
     try {
       const response = await fetch(`/api/calculations/${id}`, {
         method: 'DELETE',
       });
-      
+
       if (response.ok) {
         setCalculations(calculations.filter(calc => calc.id !== id));
       } else {
@@ -167,7 +167,7 @@ export default function SaveLoadDialog({
             Load Saved Calculations
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="flex justify-between items-center mb-4">
           <p className="text-muted-foreground">
             {calculations.length} saved calculation{calculations.length !== 1 ? 's' : ''} found

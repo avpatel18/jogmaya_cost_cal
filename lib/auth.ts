@@ -29,7 +29,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, user }) {
       // Ensure session.user.id is present if needed on client
       if (session.user) {
-        ;(session.user as any).id = user.id
+        ; (session.user as { id: unknown } & typeof session.user).id = user.id
       }
       return session
     },
