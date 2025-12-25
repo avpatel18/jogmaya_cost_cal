@@ -12,20 +12,15 @@ ENV PORT=3000
 RUN corepack enable
 
 # Copy only manifests for better caching
+# Copy only manifests for better caching
 COPY package.json yarn.lock .yarnrc.yml ./
 
-# Avoid running lifecycle scripts (e.g., prisma generate) before sources are copied
-ENV YARN_ENABLE_SCRIPTS=false
+# Copy prisma schema so postinstall generation works
+COPY prisma ./prisma/
 
 # Install dependencies immutably
+# We do NOT disable scripts because esbuild and prisma need them
 RUN yarn install --no-immutable # Allow yarn.lock to be updated if out of sync, resolving YN0028 error
-
-# Copy application source
-COPY . .
-
-# Re-enable scripts and run postinstall now that schema and sources are present
-ENV YARN_ENABLE_SCRIPTS=true
-RUN yarn postinstall
 
 # Build the Next.js app
 RUN yarn build
