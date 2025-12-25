@@ -22,6 +22,9 @@ COPY prisma ./prisma/
 # We do NOT disable scripts because esbuild and prisma need them
 RUN yarn install --no-immutable # Allow yarn.lock to be updated if out of sync, resolving YN0028 error
 
+# Copy application source
+COPY . .
+
 # Build the Next.js app
 RUN yarn build
 
