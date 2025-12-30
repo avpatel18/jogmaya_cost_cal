@@ -1,12 +1,10 @@
 import type { NextAuthOptions } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
-import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { prisma } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
-  session: { strategy: 'database' },
+  session: { strategy: 'jwt' },
   pages: {},
   providers: [
     Credentials({
@@ -26,10 +24,17 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async session({ session, user }) {
-      // Ensure session.user.id is present if needed on client
-      if (session.user) {
-        ; (session.user as { id: unknown } & typeof session.user).id = user.id
+    async jwt({ token, user }) {
+      // Add user id to token on sign in
+      if (user) {
+        token.id = user.id
+      }
+      return token
+    },
+    async session({ session, token }) {
+      // Add user id to session from token
+      if (session.user && token.id) {
+        ; (session.user as { id: unknown } & typeof session.user).id = token.id
       }
       return session
     },
